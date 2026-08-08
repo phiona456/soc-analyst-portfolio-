@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phiona Namubiru — SOC Analyst Track</title>
+<meta name="description" content="Phiona Namubiru's cybersecurity portfolio — transitioning from airline ticketing incident handling to SOC Analyst, with an interactive alert triage demo.">
+<meta property="og:title" content="Phiona Namubiru — SOC Analyst Track">
+<meta property="og:description" content="Airline ticketing & incident handling background, now building toward SOC Analyst. Includes an interactive alert triage demo.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://phiona456.github.io/soc-analyst-portfolio/images/event-detail-1.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B1220;
+    --bg-panel:#111B2E;
+    --bg-panel-2:#0E1626;
+    --line:rgba(196,212,235,0.10);
+    --line-strong:rgba(196,212,235,0.18);
+    --text:#E7ECF5;
+    --text-dim:#8D9BB5;
+    --amber:#F5A623;
+    --steel:#5B8DEF;
+    --red:#E5484D;
+    --green:#3DD68C;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Space Grotesk',sans-serif;
+    line-height:1.6;
+  }
+  h1,h2,h3{font-family:'Space Grotesk',sans-serif;font-weight:600;line-height:1.15;}
+  code, .mono{font-family:'JetBrains Mono',monospace;}
+  a{color:inherit;text-decoration:none;}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 28px;}
+
+  /* NAV */
+  nav{
+    position:sticky;top:0;z-index:50;
+    background:rgba(11,18,32,0.9);backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+  }
+  nav .wrap{display:flex;align-items:center;justify-content:space-between;padding:18px 28px;}
+  .brand{font-weight:700;font-size:1.05rem;display:flex;align-items:center;gap:10px;}
+  .brand .dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);}
+  .nav-links{display:flex;gap:30px;font-size:0.88rem;color:var(--text-dim);}
+  .nav-links a:hover{color:var(--amber);}
+  .nav-cta{
+    background:var(--amber);color:#1A1300;padding:9px 18px;border-radius:3px;
+    font-weight:600;font-size:0.85rem;
+  }
+
+  /* HERO */
+  .hero{padding:100px 0 70px;position:relative;overflow:hidden;}
+  .hero::before{
+    content:'';position:absolute;inset:0;z-index:0;
+    background:
+      radial-gradient(ellipse 600px 300px at 85% 0%, rgba(91,141,239,0.14), transparent 60%),
+      radial-gradient(ellipse 500px 260px at 5% 90%, rgba(245,166,35,0.08), transparent 60%);
+  }
+  .hero .wrap{position:relative;z-index:1;}
+  .terminal-tag{
+    display:inline-flex;align-items:center;gap:8px;
+    font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--green);
+    background:rgba(61,214,140,0.08);border:1px solid rgba(61,214,140,0.25);
+    padding:6px 12px;border-radius:3px;margin-bottom:24px;
+  }
+  .terminal-tag::before{content:'●';font-size:0.6rem;}
+  .hero h1{font-size:clamp(2.2rem,5vw,3.6rem);max-width:780px;}
+  .hero h1 .accent{color:var(--amber);}
+  .hero p{max-width:560px;color:var(--text-dim);margin-top:22px;font-size:1.05rem;}
+  .hero-actions{display:flex;gap:14px;margin-top:34px;flex-wrap:wrap;}
+  .btn-primary{
+    background:var(--amber);color:#1A1300;padding:14px 26px;border-radius:3px;
+    font-weight:600;font-size:0.92rem;
+  }
+  .btn-ghost{
+    border:1px solid var(--line-strong);padding:14px 26px;border-radius:3px;
+    font-weight:500;font-size:0.92rem;color:var(--text);
+  }
+  .btn-ghost:hover{border-color:var(--steel);}
+
+  /* STATS */
+  .stats{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--bg-panel-2);}
+  .stats .wrap{display:grid;grid-template-columns:repeat(4,1fr);padding:32px 28px;}
+  .stat{text-align:center;border-right:1px solid var(--line);}
+  .stat:last-child{border-right:none;}
+  .stat strong{display:block;font-family:'JetBrains Mono',monospace;font-size:1.6rem;color:var(--amber);}
+  .stat span{font-size:0.78rem;color:var(--text-dim);}
+
+  /* SECTION */
+  .section{padding:100px 0;}
+  .section-head{max-width:640px;margin-bottom:52px;}
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace;font-size:0.76rem;letter-spacing:0.08em;
+    text-transform:uppercase;color:var(--steel);margin-bottom:14px;display:block;
+  }
+  .section-head h2{font-size:clamp(1.7rem,3.2vw,2.3rem);}
+  .section-head p{color:var(--text-dim);margin-top:14px;}
+
+  /* TRANSITION */
+  .transition-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start;}
+  .transition-col{
+    background:var(--bg-panel);border:1px solid var(--line);border-radius:4px;padding:28px;
+  }
+  .transition-col h3{font-size:1.05rem;margin-bottom:14px;color:var(--text);}
+  .transition-col.from h3{color:var(--text-dim);}
+  .transition-col.to h3{color:var(--amber);}
+  .transition-col ul{list-style:none;}
+  .transition-col li{
+    font-size:0.92rem;color:var(--text-dim);padding:8px 0;border-bottom:1px solid var(--line);
+    display:flex;gap:10px;
+  }
+  .transition-col li:last-child{border-bottom:none;}
+  .transition-col li::before{content:'→';color:var(--steel);flex-shrink:0;}
+
+  /* ROADMAP */
+  .roadmap{background:var(--bg-panel-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
+  .roadmap-list{display:flex;flex-direction:column;}
+  .roadmap-item{
+    display:grid;grid-template-columns:60px 1fr auto;gap:20px;align-items:center;
+    padding:26px 0;border-bottom:1px solid var(--line);
+  }
+  .roadmap-item:last-child{border-bottom:none;}
+  .roadmap-index{
+    font-family:'JetBrains Mono',monospace;font-size:1.3rem;color:var(--steel);
+  }
+  .roadmap-item h3{font-size:1.05rem;margin-bottom:4px;}
+  .roadmap-item p{font-size:0.86rem;color:var(--text-dim);}
+  .roadmap-status{
+    font-family:'JetBrains Mono',monospace;font-size:0.74rem;padding:5px 12px;border-radius:20px;
+    white-space:nowrap;
+  }
+  .status-progress{background:rgba(245,166,35,0.12);color:var(--amber);border:1px solid rgba(245,166,35,0.3);}
+  .status-planned{background:rgba(91,141,239,0.1);color:var(--steel);border:1px solid rgba(91,141,239,0.28);}
+  .status-target{background:rgba(61,214,140,0.1);color:var(--green);border:1px solid rgba(61,214,140,0.28);}
+
+  /* REAL PROJECT */
+  .evidence-card{
+    background:var(--bg-panel);border:1px solid var(--line-strong);border-radius:6px;overflow:hidden;
+    margin-bottom:24px;
+  }
+  .evidence-caption{
+    padding:14px 20px;border-bottom:1px solid var(--line);
+    font-family:'JetBrains Mono',monospace;font-size:0.8rem;color:var(--text-dim);
+    background:var(--bg-panel-2);
+  }
+  .evidence-card img{width:100%;display:block;}
+  .spl-block{
+    background:#080D18;border:1px solid var(--line-strong);border-radius:4px;
+    padding:16px 20px;font-family:'JetBrains Mono',monospace;font-size:0.88rem;color:var(--green);
+    margin:18px 0;overflow-x:auto;
+  }
+  .findings-table{width:100%;border-collapse:collapse;margin:20px 0;font-size:0.88rem;}
+  .findings-table th, .findings-table td{
+    text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);
+  }
+  .findings-table th{color:var(--steel);font-weight:600;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.04em;}
+  .findings-table td:first-child{color:var(--text-dim);font-family:'JetBrains Mono',monospace;font-size:0.82rem;}
+  .mitre-tag{
+    display:inline-flex;align-items:center;gap:8px;
+    background:rgba(229,72,77,0.1);border:1px solid rgba(229,72,77,0.3);
+    color:var(--red);font-family:'JetBrains Mono',monospace;font-size:0.82rem;
+    padding:8px 14px;border-radius:4px;margin:8px 0;
+  }
+  .evidence-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+  .analysis-list{list-style:none;margin:16px 0;}
+  .analysis-list li{
+    padding:10px 0 10px 22px;position:relative;color:var(--text-dim);font-size:0.92rem;border-bottom:1px solid var(--line);
+  }
+  .analysis-list li::before{content:'▸';position:absolute;left:0;color:var(--amber);}
+  .real-badge{
+    display:inline-flex;align-items:center;gap:6px;
+    font-family:'JetBrains Mono',monospace;font-size:0.74rem;
+    background:rgba(61,214,140,0.1);border:1px solid rgba(61,214,140,0.3);color:var(--green);
+    padding:5px 12px;border-radius:20px;margin-bottom:16px;
+  }
+  .real-badge::before{content:'●';font-size:0.6rem;}
+
+  /* DASHBOARD DEMO */
+  .demo-panel{
+    background:var(--bg-panel);border:1px solid var(--line-strong);border-radius:6px;overflow:hidden;
+  }
+  .demo-topbar{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:16px 22px;border-bottom:1px solid var(--line);background:var(--bg-panel-2);
+  }
+  .demo-topbar .mono{font-size:0.8rem;color:var(--text-dim);}
+  .demo-dots{display:flex;gap:6px;}
+  .demo-dots span{width:9px;height:9px;border-radius:50%;background:var(--line-strong);}
+  .filter-bar{
+    display:flex;gap:8px;padding:16px 22px;border-bottom:1px solid var(--line);flex-wrap:wrap;
+  }
+  .filter-btn{
+    font-family:'JetBrains Mono',monospace;font-size:0.76rem;
+    padding:7px 14px;border-radius:20px;border:1px solid var(--line-strong);
+    color:var(--text-dim);background:transparent;cursor:pointer;transition:all 0.15s;
+  }
+  .filter-btn:hover{border-color:var(--steel);color:var(--text);}
+  .filter-btn.active{background:var(--steel);border-color:var(--steel);color:#fff;}
+  .filter-btn[data-sev="critical"].active{background:var(--red);border-color:var(--red);}
+  .filter-btn[data-sev="high"].active{background:var(--amber);border-color:var(--amber);color:#1A1300;}
+
+  .alert-list{max-height:420px;overflow-y:auto;}
+  .alert-row{
+    display:grid;grid-template-columns:14px 100px 1fr 130px 120px;gap:16px;align-items:center;
+    padding:16px 22px;border-bottom:1px solid var(--line);cursor:pointer;transition:background 0.15s;
+  }
+  .alert-row:hover{background:rgba(91,141,239,0.05);}
+  .alert-row:last-child{border-bottom:none;}
+  .sev-dot{width:9px;height:9px;border-radius:50%;}
+  .sev-critical{background:var(--red);box-shadow:0 0 6px var(--red);}
+  .sev-high{background:var(--amber);}
+  .sev-medium{background:var(--steel);}
+  .sev-low{background:var(--text-dim);}
+  .alert-sev{font-family:'JetBrains Mono',monospace;font-size:0.72rem;text-transform:uppercase;color:var(--text-dim);}
+  .alert-desc{font-size:0.9rem;}
+  .alert-desc .mono{font-size:0.78rem;color:var(--text-dim);display:block;margin-top:2px;}
+  .alert-time{font-family:'JetBrains Mono',monospace;font-size:0.76rem;color:var(--text-dim);}
+  .alert-status-badge{
+    font-family:'JetBrains Mono',monospace;font-size:0.72rem;padding:5px 10px;border-radius:4px;
+    text-align:center;
+  }
+  .st-new{background:rgba(229,72,77,0.12);color:var(--red);}
+  .st-investigating{background:rgba(245,166,35,0.12);color:var(--amber);}
+  .st-resolved{background:rgba(61,214,140,0.12);color:var(--green);}
+
+  .demo-footer{
+    padding:14px 22px;border-top:1px solid var(--line);background:var(--bg-panel-2);
+    font-family:'JetBrains Mono',monospace;font-size:0.76rem;color:var(--text-dim);
+    display:flex;justify-content:space-between;
+  }
+  .demo-hint{font-size:0.78rem;color:var(--text-dim);margin-top:14px;}
+
+  /* SKILLS */
+  .skills-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
+  .skill-card{
+    background:var(--bg-panel);border:1px solid var(--line);border-radius:4px;padding:24px;
+  }
+  .skill-card h3{font-size:0.95rem;margin-bottom:12px;color:var(--steel);}
+  .skill-card ul{list-style:none;font-size:0.88rem;color:var(--text-dim);}
+  .skill-card li{padding:5px 0;}
+  .skill-card li::before{content:'▸ ';color:var(--amber);}
+
+  /* CTA */
+  .cta{text-align:center;background:var(--bg-panel-2);border-top:1px solid var(--line);}
+  .cta h2{font-size:clamp(1.8rem,4vw,2.6rem);max-width:640px;margin:0 auto;}
+  .cta p{color:var(--text-dim);max-width:460px;margin:18px auto 32px;}
+
+  footer{border-top:1px solid var(--line);padding:32px 0;}
+  footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;font-size:0.82rem;color:var(--text-dim);}
+
+  @media(max-width:860px){
+    .nav-links{display:none;}
+    .stats .wrap{grid-template-columns:repeat(2,1fr);gap:20px 0;}
+    .stat{border-right:none;border-bottom:1px solid var(--line);padding-bottom:16px;}
+    .transition-grid{grid-template-columns:1fr;gap:20px;}
+    .skills-grid{grid-template-columns:1fr;}
+    .alert-row{grid-template-columns:14px 1fr;grid-template-areas:"dot desc" ". meta";}
+    .alert-sev,.alert-time,.alert-status-badge{display:none;}
+  }
+  @media (prefers-reduced-motion: reduce){*{transition-duration:0.01ms !important;}}
+  a:focus-visible, button:focus-visible{outline:2px solid var(--amber);outline-offset:2px;}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="brand"><span class="dot"></span>P. Namubiru <span class="mono" style="color:var(--text-dim);font-weight:400;">// SOC track</span></div>
+    <div class="nav-links">
+      <a href="#transition">Transition</a>
+      <a href="#roadmap">Roadmap</a>
+      <a href="#soc-lab">SOC Lab</a>
+      <a href="#demo">Demo</a>
+      <a href="#skills">Skills</a>
+    </div>
+    <a href="#contact" class="nav-cta">Contact</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="wrap">
+    <span class="terminal-tag mono">status: actively training // target: SOC Analyst, Dec 2026</span>
+    <h1>Five years spent triaging tickets<br>under deadline. <span class="accent">Now triaging alerts.</span></h1>
+    <p>I'm Phiona Namubiru — an airline ticketing and incident-handling professional in Kampala, Uganda, building toward a SOC Analyst role. Below is my transition plan, my study roadmap, and a working alert-triage demo I built to practice the actual workflow.</p>
+    <div class="hero-actions">
+      <a href="#soc-lab" class="btn-primary">See the real SOC lab project</a>
+      <a href="#roadmap" class="btn-ghost">See the roadmap</a>
+    </div>
+  </div>
+</section>
+
+<div class="stats">
+  <div class="wrap">
+    <div class="stat"><strong>5+ yrs</strong><span>Issue handling & documentation</span></div>
+    <div class="stat"><strong>Pre-Security</strong><span>TryHackMe path, in progress</span></div>
+    <div class="stat"><strong>3</strong><span>Certifications targeted (2026)</span></div>
+    <div class="stat"><strong>Dec 2026</strong><span>SOC Analyst target date</span></div>
+  </div>
+</div>
+
+<section class="section" id="transition">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">// the case for the switch</span>
+      <h2>The skills already transfer</h2>
+      <p>SOC work and airline ticketing operations look different on the surface, but the underlying discipline is the same: log everything, escalate correctly, and never let an open case go cold.</p>
+    </div>
+    <div class="transition-grid">
+      <div class="transition-col from">
+        <h3>What I've done — Ticketing Officer</h3>
+        <ul>
+          <li>Resolved time-sensitive Galileo GDS issues under strict airline deadlines</li>
+          <li>Logged every case and followed up to confirm full resolution</li>
+          <li>Escalated issues across airlines, ground handlers, and hotel partners</li>
+          <li>Maintained audit-ready documentation across all client files</li>
+        </ul>
+      </div>
+      <div class="transition-col to">
+        <h3>How it maps — SOC Analyst</h3>
+        <ul>
+          <li>Triaging alerts by severity under SLA pressure</li>
+          <li>Documenting each incident from detection to closure</li>
+          <li>Escalating confirmed threats to the right response tier</li>
+          <li>Producing clean, audit-ready incident reports</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section roadmap" id="roadmap">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">// study plan</span>
+      <h2>The path to SOC Analyst</h2>
+      <p>Four steps, in order — each one building the certification and hands-on evidence the next stage assumes.</p>
+    </div>
+    <div class="roadmap-list">
+      <div class="roadmap-item">
+        <div class="roadmap-index">01</div>
+        <div><h3>Google Cybersecurity Certificate</h3><p>Coursera — financial aid applied. Foundations of security, networks, and Linux.</p></div>
+        <div class="roadmap-status status-progress">IN PROGRESS</div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-index">02</div>
+        <div><h3>TryHackMe — Pre-Security path</h3><p>Includes Linux Strength Training and core networking rooms.</p></div>
+        <div class="roadmap-status status-progress">IN PROGRESS</div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-index">03</div>
+        <div><h3>CompTIA Security+</h3><p>Industry-standard baseline certification for SOC and security roles.</p></div>
+        <div class="roadmap-status status-planned">PLANNED</div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-index">04</div>
+        <div><h3>Blue Team Level 1 (BTL1)</h3><p>Practical, hands-on defensive security certification — the final step before applying.</p></div>
+        <div class="roadmap-status status-planned">PLANNED</div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-index">05</div>
+        <div><h3>SOC Analyst — target role</h3><p>Applying with a completed roadmap and demonstrated hands-on practice.</p></div>
+        <div class="roadmap-status status-target">TARGET · DEC 2026</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="soc-lab">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="real-badge">real project — not a simulation</span>
+      <span class="eyebrow">// featured project</span>
+      <h2>SOC Lab: Detecting Suspicious Windows Logins with Splunk</h2>
+      <p>A hands-on home lab built alongside the Google Cybersecurity Certificate and TryHackMe's Pre-Security path. I installed Splunk Enterprise, ingested my own Windows Security event logs, and investigated a real failed-login event end to end.</p>
+    </div>
+
+    <h3 style="font-size:1.05rem;margin-bottom:14px;color:var(--steel);">1. Detection</h3>
+    <p style="color:var(--text-dim);margin-bottom:8px;">Search used to surface failed login attempts (Windows Event ID 4625):</p>
+    <div class="spl-block">index=main EventCode=4625</div>
+    <p style="color:var(--text-dim);margin-bottom:20px;">Result: 2 events matched — corresponding exactly to a deliberately mistyped password at the lock screen.</p>
+
+    <h3 style="font-size:1.05rem;margin:32px 0 14px;color:var(--steel);">2. Investigation</h3>
+    <div class="evidence-card">
+      <div class="evidence-caption">splunk — raw event detail, EventCode=4625</div>
+      <img src="images/event-detail-1.jpg" alt="Splunk raw event detail showing failed login, Logon Type 2, Account Name PHIONA$">
+    </div>
+    <div class="evidence-card">
+      <div class="evidence-caption">splunk — failure information &amp; network details</div>
+      <img src="images/event-detail-2.jpg" alt="Splunk event detail showing Failure Reason, Status codes, and Source Network Address 127.0.0.1">
+    </div>
+
+    <table class="findings-table">
+      <tr><th>Field</th><th>Value</th></tr>
+      <tr><td>Logon Type</td><td>2 — Interactive (local login)</td></tr>
+      <tr><td>Failure Reason</td><td>An Error occurred during Logon</td></tr>
+      <tr><td>Status / Sub Status</td><td>0xC000006D / 0xC0000380</td></tr>
+      <tr><td>Source Network Address</td><td>127.0.0.1 (localhost)</td></tr>
+      <tr><td>Caller Process</td><td>C:\Windows\System32\svchost.exe</td></tr>
+      <tr><td>Authentication Package</td><td>Negotiate</td></tr>
+    </table>
+
+    <ul class="analysis-list">
+      <li><strong style="color:var(--text);">Logon Type 2</strong> confirms an interactive attempt at the physical machine, matching the lock-screen test.</li>
+      <li><strong style="color:var(--text);">Source 127.0.0.1</strong> confirms the attempt was local — in a real environment, the same search against an external source IP with repeated failures would indicate a brute-force attempt instead.</li>
+    </ul>
+
+    <h3 style="font-size:1.05rem;margin:32px 0 14px;color:var(--steel);">3. Turning it into a repeatable detection</h3>
+    <p style="color:var(--text-dim);margin-bottom:8px;">Extending the search to group failures by account and source — the first step toward a real brute-force alert:</p>
+    <div class="spl-block">index=main EventCode=4625<br>| stats count by Account_Name, ComputerName, Logon_Type, Source_Network_Address</div>
+    <div class="evidence-card">
+      <div class="evidence-caption">splunk — aggregated statistics view</div>
+      <img src="images/stats-query.jpg" alt="Splunk statistics table showing aggregated counts of failed login fields">
+    </div>
+
+    <h3 style="font-size:1.05rem;margin:32px 0 14px;color:var(--steel);">4. MITRE ATT&CK mapping</h3>
+    <div class="mitre-tag">T1110 — Brute Force (T1110.001 — Password Guessing)</div>
+    <p style="color:var(--text-dim);margin-top:12px;">Repeated Event ID 4625 entries against the same account — especially from an external source — are a primary indicator analysts use to detect this technique in production environments.</p>
+
+    <p style="margin-top:32px;">
+      <a href="#" class="btn-ghost" id="github-link">Full write-up on GitHub →</a>
+    </p>
+  </div>
+</section>
+
+<section class="section" id="demo" style="background:var(--bg-panel-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line);">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">// practice build</span>
+      <h2>Alert triage dashboard (interactive demo)</h2>
+      <p>A small interactive simulation of the first thing a SOC Analyst does each shift: scan incoming alerts, filter by severity, and move each one through its status. Click any row to change its status — this is a front-end demo I built to practice the triage workflow, separate from the real Splunk project above.</p>
+    </div>
+
+    <div class="demo-panel">
+      <div class="demo-topbar">
+        <div class="demo-dots"><span></span><span></span><span></span></div>
+        <span class="mono">soc-triage-console.local</span>
+        <span class="mono" id="alert-count">6 alerts</span>
+      </div>
+      <div class="filter-bar">
+        <button class="filter-btn active" data-sev="all">All</button>
+        <button class="filter-btn" data-sev="critical">Critical</button>
+        <button class="filter-btn" data-sev="high">High</button>
+        <button class="filter-btn" data-sev="medium">Medium</button>
+        <button class="filter-btn" data-sev="low">Low</button>
+      </div>
+      <div class="alert-list" id="alert-list"></div>
+      <div class="demo-footer">
+        <span>Click a row to cycle: New → Investigating → Resolved</span>
+        <span id="resolved-count">0 resolved</span>
+      </div>
+    </div>
+    <p class="demo-hint">Built with vanilla HTML, CSS, and JavaScript — no frameworks, no backend, just DOM manipulation and event handling.</p>
+  </div>
+</section>
+
+<section class="section" id="skills" style="background:var(--bg-panel-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line);">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">// current toolkit</span>
+      <h2>Skills in progress</h2>
+    </div>
+    <div class="skills-grid">
+      <div class="skill-card">
+        <h3>Security fundamentals</h3>
+        <ul>
+          <li>Linux command line basics</li>
+          <li>Networking fundamentals</li>
+          <li>Security principles (Google Cert)</li>
+          <li>OS Intro & Windows basics (TryHackMe)</li>
+        </ul>
+      </div>
+      <div class="skill-card">
+        <h3>Web development</h3>
+        <ul>
+          <li>HTML, CSS, JavaScript (SheCodes)</li>
+          <li>DOM manipulation & event handling</li>
+          <li>Building and shipping live sites (GitHub Pages)</li>
+        </ul>
+      </div>
+      <div class="skill-card">
+        <h3>Operational discipline</h3>
+        <ul>
+          <li>Incident documentation under deadline</li>
+          <li>Multi-party escalation & follow-up</li>
+          <li>Audit-ready record keeping</li>
+          <li>Asana project management (certified)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section cta" id="contact">
+  <div class="wrap">
+    <h2>Open to entry-level SOC and security roles.</h2>
+    <p>Currently based in Kampala, Uganda. Happy to walk through the roadmap, the demo above, or my ticketing background in more detail.</p>
+    <a href="mailto:phionan82@gmail.com" class="btn-primary">phionan82@gmail.com</a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Phiona Namubiru</span>
+    <span>Kampala, Uganda · +256 702 848 197</span>
+  </div>
+</footer>
+
+<script>
+  const alerts = [
+    { sev:'critical', title:'Multiple failed admin logins detected', meta:'src: 10.20.4.11 → auth-server-02', time:'2m ago', id:1 },
+    { sev:'high', title:'Malware signature match on endpoint', meta:'host: FIN-WKS-014 · trojan.generic', time:'14m ago', id:2 },
+    { sev:'high', title:'Phishing email reported by user', meta:'from: billing-support@paypa1-secure.com', time:'26m ago', id:3 },
+    { sev:'medium', title:'Unusual outbound traffic volume', meta:'host: DEV-SRV-07 → unknown external IP', time:'41m ago', id:4 },
+    { sev:'medium', title:'New device enrolled outside business hours', meta:'user: j.otieno · 02:14 local time', time:'1h ago', id:5 },
+    { sev:'low', title:'Repeated password reset requests', meta:'user: a.kintu · 3 requests in 10 min', time:'2h ago', id:6 },
+  ];
+
+  const statusCycle = ['new','investigating','resolved'];
+  const statusLabel = { new:'NEW', investigating:'INVESTIGATING', resolved:'RESOLVED' };
+  let state = alerts.map(a => ({...a, status:'new'}));
+  let currentFilter = 'all';
+
+  function render(){
+    const list = document.getElementById('alert-list');
+    const visible = state.filter(a => currentFilter === 'all' || a.sev === currentFilter);
+    list.innerHTML = '';
+    visible.forEach(a => {
+      const row = document.createElement('div');
+      row.className = 'alert-row';
+      row.innerHTML = `
+        <div class="sev-dot sev-${a.sev}"></div>
+        <div class="alert-sev">${a.sev}</div>
+        <div class="alert-desc">${a.title}<span class="mono">${a.meta}</span></div>
+        <div class="alert-time">${a.time}</div>
+        <div class="alert-status-badge st-${a.status}">${statusLabel[a.status]}</div>
+      `;
+      row.addEventListener('click', () => {
+        const idx = statusCycle.indexOf(a.status);
+        a.status = statusCycle[(idx + 1) % statusCycle.length];
+        render();
+      });
+      list.appendChild(row);
+    });
+    document.getElementById('alert-count').textContent = `${visible.length} alerts`;
+    document.getElementById('resolved-count').textContent =
+      `${state.filter(a => a.status === 'resolved').length} resolved`;
+  }
+
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentFilter = btn.dataset.sev;
+      render();
+    });
+  });
+
+  render();
+</script>
+
+</body>
+</html>
